@@ -1,29 +1,31 @@
 const express = require('express');
 const app = express();
 
-app.get("/api/timestamp/:date_string?", (req, res) => {
-  // Your logic here
-});
+// Enable CORS for FreeCodeCamp testing
+const cors = require('cors');
+app.use(cors());
 
 app.get("/api/timestamp/:date_string?", (req, res) => {
-    let dateString = req.params.date_string;
-    let date;
-  
-    if (!dateString) {
-      date = new Date();
-    } else if (/^\d+$/.test(dateString)) {
-      date = new Date(parseInt(dateString));
+  let { date_string } = req.params;
+  let date;
+
+  if (!date_string) {
+    date = new Date();
+  } else {
+    // Check if it's a UNIX timestamp (all digits)
+    if (/^\d+$/.test(date_string)) {
+      date = new Date(parseInt(date_string));
     } else {
-      date = new Date(dateString);
+      date = new Date(date_string);
     }
-  
-    if (isNaN(date.getTime())) {
-      return res.json({ error: "Invalid Date" });
-    }
-  
-    res.json({
-      unix: date.getTime(),
-      utc: date.toUTCString()
-    });
+  }
+
+  if (date.toString() === "Invalid Date") {
+    return res.json({ error: "Invalid Date" });
+  }
+
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
   });
-  
+});
